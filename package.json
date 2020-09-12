@@ -1,0 +1,19 @@
+{
+  "name": "getnifc",
+  "version": "0.0.1",
+  "description": "Get NIFC data",
+  "main": "getNIFC.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@turf/turf": "^5.1.6",
+    "axios": "^0.20.0",
+    "cli": "^1.0.1",
+    "simple-node-logger": "^18.12.24",
+    "slugify": "^1.4.5",
+    "cesium": "1.53.0"
+  }
+}
