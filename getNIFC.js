@@ -46,17 +46,16 @@ if (options.help) {
   cli.getUsage();
 } else {
   dest = options.dest
-  log.info('get forestland data')
+  log.info('Get forestland data')
   axios.get(options.forest).then(f => {
     forestland = turf.flatten(f.data)
-    fs.rmdirSync(dest, {recursive: true})
     fs.mkdirSync(dest + '/' + year, {recursive: true})
     getNIFCData()
   })
 }
 
 function getNIFCData() {
-  log.info('get NIFC data')
+  log.info('Get NIFC data')
   axios.get(archivedUrl, {params: params}).then(a => {
     //console.log(a.data.features)
     addFireReports(a.data.features, 'archived')
