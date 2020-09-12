@@ -1,13 +1,13 @@
 {
   "name": "getnifc",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Get NIFC data",
   "main": "getNIFC.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Ricardo Morin",
+  "license": "MIT",
   "dependencies": {
     "@turf/turf": "^5.1.6",
     "axios": "^0.20.0",
