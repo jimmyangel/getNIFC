@@ -69,7 +69,6 @@ function getNIFCData() {
         //console.log('Update forest land percentage')
         updateForestPercent()
         log.info('Write fire records file')
-        console.log(JSON.stringify(fireRecords.map(fr => fr.fireRecord), null, 2))
         fs.writeFileSync(dest + '/current_yearfireRecords.json', JSON.stringify(fireRecords.map(fr => fr.fireRecord), null, 2))
         log.info('Write fire report files')
         fireRecords.forEach(fr => {
