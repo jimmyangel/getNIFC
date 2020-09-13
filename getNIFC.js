@@ -83,13 +83,14 @@ function getNIFCData() {
 function addFireReports(features, dataSource) {
   features.forEach(f => {
     if (f.properties.IncidentName) {
+      let GA = Math.floor(turf.area(f)/4046.86)
       if (!fireRecords[f.properties.IncidentName]) {
         fireRecords[f.properties.IncidentName] = {
           fireRecord: {
             fireYear: 'current_year',
             fireName: f.properties.IncidentName,
             fireFileName: slugify(f.properties.IncidentName, '_'),
-            fireMaxAcres: Math.floor(f.properties.GISAcres),
+            fireMaxAcres: Math.floor(turf.area(f)/4046.86),
             bbox: turf.bbox(f),
             location: turf.center(f).geometry.coordinates,
             percentForest: 100,
@@ -98,7 +99,6 @@ function addFireReports(features, dataSource) {
           features: []
         }
       } else {
-        let GA = Math.floor(f.properties.GISAcres)
         // Use max area's bbox and center
         if (GA > fireRecords[f.properties.IncidentName].fireRecord.fireMaxAcres) {
           fireRecords[f.properties.IncidentName].fireRecord.fireMaxAcres = GA
@@ -110,7 +110,7 @@ function addFireReports(features, dataSource) {
         {
           dataSource: dataSource,
           fireReportDate: new Date(f.properties.DateCurrent),
-          fireReportAcres: Math.floor(f.properties.GISAcres)
+          fireReportAcres: GA
         }
       )
       fireRecords[f.properties.IncidentName].features.push(
@@ -121,7 +121,7 @@ function addFireReports(features, dataSource) {
             fireReportDate: new Date(f.properties.DateCurrent),
             fireName: f.properties.IncidentName,
             fireYear: 'current_year',
-            GISACRES: Math.floor(f.properties.GISAcres)
+            GISACRES: GA
           }
         }
       )
