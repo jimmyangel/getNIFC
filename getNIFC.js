@@ -23,7 +23,7 @@ let archivedUrl = 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/ser
 let params = {
   where: '1=1',
   //where: 'IncidentName=\'Archie Creek\'',
-  //outFields: 'IRWINID,CreateDate,DateCurrent,IncidentName,GISAcres',
+  outFields: 'DateCurrent,IncidentName',
   outFields: '*',
   orderByFields: 'DateCurrent',
   geometry: '-124.567,41.992,-116.464,46.292',
