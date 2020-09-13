@@ -14,8 +14,10 @@ let dest
 
 let forestland
 let forestlandArea
+let stateBoundary
 let fireRecords = {}
 
+let stateBoundaryUrl = 'https://stable-data.oregonhowl.org/oregon/oregon.json'
 let activeUrl = 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/Public_Wildfire_Perimeters_View/FeatureServer/0/query'
 let archivedUrl = 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/Archived_Wildfire_Perimeters2/FeatureServer/0/query'
 let params = {
@@ -49,9 +51,13 @@ if (options.help) {
   log.info('Get forestland data')
   axios.get(options.forest).then(f => {
     forestland = turf.flatten(f.data)
-    try {fs.mkdirSync(dest + '/')} catch(err) {if (err.code !== 'EEXIST') {throw(err)}}
-    try {fs.mkdirSync(dest + '/' + year)} catch (err) {if (err.code !== 'EEXIST') {throw(err)}}
-    getNIFCData()
+    log.info('Get state boundary')
+    axios.get(stateBoundaryUrl).then(s => {
+      stateBoundary = s.data
+      try {fs.mkdirSync(dest + '/')} catch(err) {if (err.code !== 'EEXIST') {throw(err)}}
+      try {fs.mkdirSync(dest + '/' + year)} catch (err) {if (err.code !== 'EEXIST') {throw(err)}}
+      getNIFCData()
+    })
   })
 }
 
@@ -85,47 +91,50 @@ function addFireReports(features, dataSource) {
     if (f.properties.IncidentName) {
       let GA = Math.floor(turf.area(f)/4046.86)
       if (GA >= 1000) {
-        if (!fireRecords[f.properties.IncidentName]) {
-          fireRecords[f.properties.IncidentName] = {
-            fireRecord: {
-              fireYear: 'current_year',
-              fireName: f.properties.IncidentName,
-              fireFileName: slugify(f.properties.IncidentName, '_'),
-              fireMaxAcres: Math.floor(turf.area(f)/4046.86),
-              bbox: turf.bbox(f),
-              location: turf.center(f).geometry.coordinates,
-              percentForest: 100,
-              fireReports: []
-            },
-            features: []
-          }
-        } else {
-          // Use max area's bbox and center
-          if (GA > fireRecords[f.properties.IncidentName].fireRecord.fireMaxAcres) {
-            fireRecords[f.properties.IncidentName].fireRecord.fireMaxAcres = GA
-            fireRecords[f.properties.IncidentName].fireRecord.bbox = turf.bbox(f)
-            fireRecords[f.properties.IncidentName].fireRecord.location = turf.center(f).geometry.coordinates
-          }
-        }
-        fireRecords[f.properties.IncidentName].fireRecord.fireReports.push(
-          {
-            dataSource: dataSource,
-            fireReportDate: new Date(f.properties.DateCurrent),
-            fireReportAcres: GA
-          }
-        )
-        fireRecords[f.properties.IncidentName].features.push(
-          {
-            type: 'Feature',
-            geometry: f.geometry,
-            properties: {
-              fireReportDate: new Date(f.properties.DateCurrent),
-              fireName: f.properties.IncidentName,
-              fireYear: 'current_year',
-              GISACRES: GA
+        let bbox = turf.bbox(f)
+        if (!turf.booleanDisjoint(turf.bboxPolygon(bbox), stateBoundary.features[0])) {
+          if (!fireRecords[f.properties.IncidentName]) {
+            fireRecords[f.properties.IncidentName] = {
+              fireRecord: {
+                fireYear: 'current_year',
+                fireName: f.properties.IncidentName,
+                fireFileName: slugify(f.properties.IncidentName, '_'),
+                fireMaxAcres: Math.floor(turf.area(f)/4046.86),
+                bbox: bbox,
+                location: turf.center(f).geometry.coordinates,
+                percentForest: 100,
+                fireReports: []
+              },
+              features: []
+            }
+          } else {
+            // Use max area's bbox and center
+            if (GA > fireRecords[f.properties.IncidentName].fireRecord.fireMaxAcres) {
+              fireRecords[f.properties.IncidentName].fireRecord.fireMaxAcres = GA
+              fireRecords[f.properties.IncidentName].fireRecord.bbox = bbox
+              fireRecords[f.properties.IncidentName].fireRecord.location = turf.center(f).geometry.coordinates
             }
           }
-        )
+          fireRecords[f.properties.IncidentName].fireRecord.fireReports.push(
+            {
+              dataSource: dataSource,
+              fireReportDate: new Date(f.properties.DateCurrent),
+              fireReportAcres: GA
+            }
+          )
+          fireRecords[f.properties.IncidentName].features.push(
+            {
+              type: 'Feature',
+              geometry: f.geometry,
+              properties: {
+                fireReportDate: new Date(f.properties.DateCurrent),
+                fireName: f.properties.IncidentName,
+                fireYear: 'current_year',
+                GISACRES: GA
+              }
+            }
+          )
+        }
       }
     }
   })
