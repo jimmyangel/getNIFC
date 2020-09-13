@@ -172,29 +172,29 @@ function updateForestPercent() {
 
 function computeForestLandPercent(shape) {
 
-  let area = turf.area(shape);
-  let iArea = 0;
+  let area = turf.area(shape)
+  let iArea = 0
 
   if (area > 0) {
-    let fShape = turf.flatten(shape);
-    fShape.features.forEach(function (feature) {
+    let fShape = turf.flatten(shape)
+    fShape.features.forEach((feature) => {
       if (turf.area(feature)) {
-        forestland.features.forEach(function (forest) {
+        forestland.features.forEach((forest) => {
           if (turf.area(forest)) {
-            let intersection;
+            let intersection
             // Sometimes shapes are crappy, so ignore those
             try {
-              intersection = turf.intersect(turf.simplify(feature, {tolerance: 0.0001}), forest);
+              intersection = turf.intersect(turf.simplify(feature, {tolerance: 0.0001}), forest)
             } catch (e) {
             }
             if (intersection) {
-                iArea += turf.area(intersection);
+                iArea += turf.area(intersection)
             }
           }
-        });
+        })
       }
-    });
-    return Math.round(100*(iArea/area));
+    })
+    return Math.round(100*(iArea/area))
   }
-  return 0;
+  return 0
 }
