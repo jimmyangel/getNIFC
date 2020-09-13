@@ -49,7 +49,8 @@ if (options.help) {
   log.info('Get forestland data')
   axios.get(options.forest).then(f => {
     forestland = turf.flatten(f.data)
-    fs.mkdirSync(dest + '/' + year, {recursive: true})
+    try {fs.mkdirSync(dest + '/')} catch(err) {if (err.code !== 'EEXIST') {throw(err)}}
+    try {fs.mkdirSync(dest + '/' + year)} catch (err) {if (err.code !== 'EEXIST') {throw(err)}}
     getNIFCData()
   })
 }
