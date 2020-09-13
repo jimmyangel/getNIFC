@@ -22,7 +22,6 @@ let activeUrl = 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/servi
 let archivedUrl = 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/Archived_Wildfire_Perimeters2/FeatureServer/0/query'
 let params = {
   where: '1=1',
-  //where: 'IncidentName=\'Archie Creek\'',
   outFields: 'DateCurrent,IncidentName',
   outFields: '*',
   orderByFields: 'DateCurrent',
